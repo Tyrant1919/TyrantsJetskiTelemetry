@@ -6,6 +6,9 @@ Adafruit_MMA8451 mma = Adafruit_MMA8451();
 int Ptime;      //integer for storing high time of rpm pulse
 int rpm;        //storing frequency
 float acceleration;
+unsigned long then;
+unsigned long now;
+unsigned long timedif;
 
 void setup(void) {
   pinMode(8,INPUT);
@@ -15,9 +18,10 @@ void setup(void) {
     while (1);
   }
   mma.setRange(MMA8451_RANGE_4_G);
-  Serial.print("Range = "); Serial.print(2 << mma.getRange());  
-  Serial.println("G");
-}
+  //Serial.print("Range = "); Serial.print(2 << mma.getRange());  
+  //Serial.println("G");
+  then = 0;
+  }
 
 void loop() {
   // Get accelerometer data
@@ -26,12 +30,18 @@ void loop() {
   mma.getEvent(&event);
   acceleration = sqrt(sq(event.acceleration.x) + sq(event.acceleration.y) + sq(event.acceleration.z));
   // Get RPM data
-  Ptime=pulseIn(8,HIGH);      //read high time of rpm pulse
-  rpm=30000000/Ptime;    //getting RPM with Ptime in Micro seconds
+  //Ptime=pulseIn(8,HIGH);      //read high time of rpm pulse
+  //rpm=30000000/Ptime;    //getting RPM with Ptime in Micro seconds
+  now = millis();
+  timedif = now - then;
+  then = now;
   // Print data to serial
+  Serial.print(now); Serial.print("|");
+  Serial.print(timedif); Serial.print("|");
   Serial.print(acceleration, 2); Serial.print("|");
   Serial.print(event.acceleration.x); Serial.print("|"); 
   Serial.print(event.acceleration.y); Serial.print("|");
-  Serial.print(event.acceleration.z); Serial.print("|");
-  Serial.println(rpm);
+  Serial.println(event.acceleration.z);// Serial.println("|");
+  //Serial.println(rpm);
+  delay(15);
 }
